@@ -1,0 +1,56 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: my-cluster-default-psp
+  namespace: zero
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:restricted
+subjects:
+  - kind: ServiceAccount
+    name: my-cluster-zookeeper
+    namespace: zero
+  - kind: ServiceAccount
+    name: my-cluster-kafka
+    namespace: zero
+  - kind: ServiceAccount
+    name: my-cluster-entity-operator
+    namespace: zero
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster
+  namespace: zero
+spec:
+  kafka:
+    replicas: 1
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+        authentication:
+          type: tls
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: false
+    storage:
+      type: persistent-claim
+      size: 10Gi
+      deleteClaim: true
+      class: pv-ssd-root-ec-sc
+#    config:
+  zookeeper:
+    replicas: 1
+    storage:
+      type: persistent-claim
+      size: 10Gi
+      deleteClaim: true
+      class: pv-ssd-root-ec-sc

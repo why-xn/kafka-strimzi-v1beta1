@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: my-cluster-rb
+  namespace: zero
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: privileged-psp
+subjects:
+  - kind: ServiceAccount
+    name: my-cluster-zookeeper
+    namespace: zero
+  - kind: ServiceAccount
+    name: my-cluster-kafka
+    namespace: zero
